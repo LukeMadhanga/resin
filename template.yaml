@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  resin
+
+  SAM Template for resin
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Api:
+    BinaryMediaTypes:
+      - '*/*'
+  Function:
+    Timeout: 90
+
+Resources:
+  Resin:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/servanuerless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: resin/
+      MemorySize: 1536
+      Handler: main.lambda_handler
+      FunctionName: Resin
+      Description: Resin OTF image processing
+      Runtime: python3.7
+      Environment:
+        Variables:
+          UPLOAD_TO_S3: 1
+          BUCKET_NAME: '' # REQUIRED if UPLOAD_TO_S3 = 1
+          DEFAULT_OBJECT_POLICY: 'public-read'
+          CACHE_CONTROL: 'max-age=31536000'
+          KNOWN_DOMAINS: ''
+          SIGNATURE_KEY: '' # REQUIRED
+      Events:
+        Resin:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: '/s/{path+}'
+            Method: get
+      Policies:
+        - AmazonS3FullAccess
+
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ResinApi:
+    Description: "API Gateway endpoint URL for Prod stage for Resin function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/s/"
+  ResinFunction:
+    Description: "Resin Lambda Function ARN"
+    Value: !GetAtt Resin.Arn
