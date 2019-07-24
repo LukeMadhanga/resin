@@ -35,7 +35,7 @@ class Resin:
         :return: A tuple in the form (binary, file extension, content type)
         """
 
-        extension = os.path.splitext(path)[1][1:]
+        extension = re.sub('^([a-zA-Z0-9]+).*', '\\1', os.path.splitext(path)[1][1:])
 
         req = requests.get(path, stream=True)
         req.raw.decode_content = True
