@@ -201,7 +201,6 @@ def process_request(path, params):
     :return: An object with data for which to instantiate Resin
     """
 
-    path = urllib.parse.unquote(path)  # Just make sure...
     path_parts = path.split('/')
 
     wh = path_parts[0]
