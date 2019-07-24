@@ -29,7 +29,7 @@ Resources:
           BUCKET_NAME: '' # REQUIRED if UPLOAD_TO_S3 = 1
           DEFAULT_OBJECT_POLICY: 'public-read'
           CACHE_CONTROL: 'max-age=31536000'
-          KNOWN_DOMAINS: ''
+          KNOWN_DOMAINS: '' # A comma separated list of domains known to be good that do not need a signature
           SIGNATURE_KEY: '' # REQUIRED
       Events:
         Resin:
