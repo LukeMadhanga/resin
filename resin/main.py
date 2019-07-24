@@ -225,7 +225,7 @@ def process_request(path, params):
         'height': height,
         'bleed': 0.0,
         'crop_centering': tuple(centering),
-        'output_path': 's/%s/%s' % (wh, src)
+        'output_path': 's/%s/%s' % (wh, urllib.parse.quote(src, safe=''))
     }
 
     return output
