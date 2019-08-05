@@ -305,7 +305,6 @@ def lambda_handler(event, context):
         'isBase64Encoded': True,
         'body': base64.b64encode(image_binary).decode("utf-8"),
         'headers': {
-            'Content-type': im.mime_type,
-            'Cache-control': 'max-age=31536000'
+            'Content-type': im.mime_type
         }
     }
