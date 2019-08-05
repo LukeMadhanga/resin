@@ -250,7 +250,8 @@ def err(http_code, msg):
     return {
         'statusCode': http_code,
         'headers': {
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
+            'Cache-control': 'max-age=0'
         },
         'body': json.dumps({
             'error': msg
@@ -304,6 +305,7 @@ def lambda_handler(event, context):
         'isBase64Encoded': True,
         'body': base64.b64encode(image_binary).decode("utf-8"),
         'headers': {
-            'Content-type': im.mime_type
+            'Content-type': im.mime_type,
+            'Cache-control': 'max-age=31536000'
         }
     }
