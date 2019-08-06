@@ -9,6 +9,7 @@ import urllib.parse
 
 from io import BytesIO
 from PIL import Image, ImageOps, ImageFile
+from traceback import format_exc
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -161,10 +162,12 @@ def validate_src(path, signature=None):
     :param path: The image path
 
     :type signature: str|None
-    :param signature: hashlib.md5(urllib.parse.quote(img_url, safe='') + os.environ['SIGNATURE_KEY']).hexdigest()
+    :param signature: hashlib.md5(img_url + os.environ['SIGNATURE_KEY']).hexdigest()
 
     :exception: Exception
     """
+
+    path = str(path)
 
     path_parts = path.split('/')
 
@@ -179,8 +182,7 @@ def validate_src(path, signature=None):
             if domain.find(x) > -1:
                 return True
 
-    url_encoded = urllib.parse.quote(path, safe='')
-    hashed_path = hashlib.md5(url_encoded.encode('utf-8') + os.environ['SIGNATURE_KEY'].encode('utf-8')).hexdigest()
+    hashed_path = hashlib.md5(path.encode('utf-8') + os.environ['SIGNATURE_KEY'].encode('utf-8')).hexdigest()
 
     if hashed_path != signature:
         raise Exception('Failed to validate source file')
@@ -191,8 +193,14 @@ def process_request(path, params):
     Process the request
 
     :type params: str
-    :param path: The URL path, in the form /s/<width>x<height>/<img_url>[?sgn=signature]. In SAM-CLI, this path will NOT
-        be encoded, but in real env, this will be encoded
+    :param path: The URL path, in the form /s/<width>x<height>/<base_64>[/base_name[?sgn=signature]]. The base_64 can
+        be a base64 encoded URL, or a JSON object in the form
+        {
+            s: str Image src,
+            c: list Crop centering, e.g. [.5, .5] to crop from the centre,
+            ...
+        }.
+        This part has to be base64 encoded, otherwise the URL will be URL-encoded
 
     :type path: dict
     :param params: A dict of GET parameters
@@ -201,11 +209,9 @@ def process_request(path, params):
     :return: An object with data for which to instantiate Resin
     """
 
-    path = urllib.parse.unquote(path)
-
     path_parts = path.split('/')
 
-    wh = path_parts[0]
+    wh = path_parts.pop(0)
 
     if not wh or not re.match(r'^\d+x\d+$', wh):
         raise Exception('Missing width/height')
@@ -215,9 +221,21 @@ def process_request(path, params):
     width = int(wh_parts[0])
     height = int(wh_parts[1])
 
+    raw_input = base64.b64decode(path_parts.pop(0)).decode('utf-8')
+
     centering = [.5, .5]
 
-    src = '/'.join(path_parts[1:])
+    try:
+        options = json.loads(raw_input)
+        src = options['s']
+
+        if 'c' in options:
+            centering = options['c']
+
+        # @todo Can add more params here
+
+    except (ValueError, TypeError):
+        src = raw_input
 
     validate_src(src, params['sgn'] if 'sgn' in params else None)
 
@@ -227,7 +245,7 @@ def process_request(path, params):
         'height': height,
         'bleed': 0.0,
         'crop_centering': tuple(centering),
-        'output_path': 's/%s/%s' % (wh, urllib.parse.quote(src, safe=''))
+        'output_path': 's/' + path
     }
 
     return output
@@ -284,6 +302,7 @@ def lambda_handler(event, context):
     try:
         req = process_request(event['pathParameters']['path'], params)
     except Exception as ex:
+        print(format_exc())
         return err(422, str(ex))
 
     im = Resin(req['src'])
