@@ -5,7 +5,6 @@ import base64
 import boto3
 import hashlib
 import re
-import urllib.parse
 
 from io import BytesIO
 from PIL import Image, ImageOps, ImageFile
