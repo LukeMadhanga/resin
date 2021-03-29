@@ -2,6 +2,14 @@
 
 > On the fly image resizing
 
+
+## Prerequisites
+
+- Docker
+- AWS CLI
+- SAM CLI
+
+
 ##### To run and deploy:
 
 ```bash
