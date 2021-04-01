@@ -96,12 +96,15 @@ class Resin:
 
         self.image = ImageOps.fit(self.image, (width, height), Image.BICUBIC, centering=centering)
 
-    def get_as_bytes(self, format=None):
+    def get_as_bytes(self, format=None, quality=80):
         """
         Get the current image as bytes
 
         :type format: string|None
         :param format: The output image format
+
+        :type quality: int
+        :param quality: The quality of the image
 
         :rtype: binary
         :return: Image binary
@@ -114,7 +117,7 @@ class Resin:
             format = 'jpeg'
 
         temp = BytesIO()
-        self.image.save(temp, format=format, quality=100)
+        self.image.save(temp, format=format, quality=quality)
 
         return temp.getvalue()
 
@@ -223,6 +226,7 @@ def process_request(path, params):
     raw_input = base64.b64decode(path_parts.pop(0)).decode('utf-8')
 
     centering = [.5, .5]
+    quality = 80
 
     try:
         options = json.loads(raw_input)
@@ -230,6 +234,9 @@ def process_request(path, params):
 
         if 'c' in options:
             centering = options['c']
+
+        if 'q' in options:
+            quality = options['q']
 
         # @todo Can add more params here
 
@@ -244,7 +251,8 @@ def process_request(path, params):
         'height': height,
         'bleed': 0.0,
         'crop_centering': tuple(centering),
-        'output_path': 's/' + path
+        'output_path': 's/' + path,
+        'quality': quality
     }
 
     return output
@@ -308,7 +316,7 @@ def lambda_handler(event, context):
 
     im.thumbnail(req['width'], req['height'], centering=req['crop_centering'])
 
-    image_binary = im.get_as_bytes()
+    image_binary = im.get_as_bytes(None, req['quality'])
 
     cache_control = os.environ['CACHE_CONTROL']
 
