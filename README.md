@@ -144,3 +144,14 @@ To set up
 5. On the `Origins and Origin Groups` again, click `Create Origin Group`.
 6. Set the S3 origin as the primary endpoint, and then add the Lambda origin as the backup.
 7. Select `404` and `403` as the only `Failover criteria`.
+
+#### Example Implementations
+
+* Laravel
+    - `cp implementations/laravel/ImageResize.php ~/laravel-project/app/Utilities/`
+    - `cp implementations/laravel/ImageResizeTest.php ~/laravel-project/tests/Feature/`
+    - `composer dump-autoload`
+    - Copy the stub in `implementations/laravel/helpers.php` to your Laravel project's `helpers.php`
+    - Copy the example env vars in `implementations/laravel/env` to your `.env` and `.env.example`.
+    - `{!! imageResize('known-domain-image-source')->setDimensions(width, height)->render(['attribute' => 'value']) !!}`
+    - `{!! imageResize('random-image-source')->setDimensions(width, height)->sign(true)->render(['class' => 'w-100']) !!}`
