@@ -89,11 +89,15 @@ sam deploy --capabilities CAPABILITY_IAM [--profile=<aws-profile>] --template-fi
 
 The URL in the template is written as `/s/{path+}`. If this path is not met, then you'll get the error
 
-> {"message":"Missing Authentication Token"}
+```
+{"message":"Missing Authentication Token"}
+```
 
 A full URL example is
 
-> /s/<width>x<height>/<base64-src>/base-name.jpg?sgn=value
+```
+/s/<width>x<height>/<base64-src>/base-name.jpg?sgn=value
+```
 
 * `/s/` Required to create a sub-folder in your bucket to keep resized images separate.
 * `<width>x<height>` e.g. `300x300`, the width and height of the image. Creates a sub-folder under `/s/`.
