@@ -111,3 +111,36 @@ URL JSON Options
 | s | | Required. The source of the image |
 | c | [0.5, 0.5] | Optional. In the event a crop is performed, the centering of the crop as a percentage between 0 and 1 |
 | q | 80 | Optional. The quality of the scale between 0 and 100 |
+
+##### CloudFront
+
+This part is optional but recommended. It is implemented after you have successfully deployed your lambda application. 
+As things stand, we will always resize images using our lambda script which is expensive. We will instead use 
+CloudFront Origin Groups to only ever resize an image if it does not exist.
+
+Example
+* Navigate to `xxx.cloudfront.net/s/wxh/image-source/basename.png`.
+* CloudFront hasn't cached the image.
+* CloudFront requests the image from S3.
+* S3 returns either 404 or 403.
+* CloudFront fails over to Lambda.
+* Lambda generates the image, saves it on S3 and then returns the binary.
+* ... Time passes
+* Navigate again to `xxx.cloudfront.net/s/wxh/image-source/basename.png`.
+* Image is no longer in CloudFront's cache.
+* CloudFront requests the image from S3.
+* S3 returns the image.
+
+
+To set up
+
+
+1. Create a new [CloudFront distribution](https://console.aws.amazon.com/cloudfront/home) using the bucket you set for the environment variable `BUCKET_NAME`.
+2. On the `Origins and Origin Groups` tab, click `Create Origin`.
+3. Find the Lambda URL for your new app.
+    - Set the base path as `Origin Domain Name`, e.g. `<id>.execute-api.eu-west-1.amazonaws.com`.
+    - Set `/Prod` as `Origin Path`. (`/Prod` comes from `template.yaml: Outputs.ResinApi.Value`).
+4. Save the new origin.
+5. On the `Origins and Origin Groups` again, click `Create Origin Group`.
+6. Set the S3 origin as the primary endpoint, and then add the Lambda origin as the backup.
+7. Select `404` and `403` as the only `Failover criteria`.
