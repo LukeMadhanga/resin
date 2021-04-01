@@ -1,0 +1,10 @@
+{
+  "Resin": {
+    "BUCKET_NAME": "",
+    "CACHE_CONTROL": "max-age=31536000",
+    "DEFAULT_OBJECT_POLICY": "public-read",
+    "KNOWN_DOMAINS": "staticflickr.com",
+    "SIGNATURE_KEY": "",
+    "UPLOAD_TO_S3": "1"
+  }
+}
