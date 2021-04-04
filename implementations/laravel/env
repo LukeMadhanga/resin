@@ -1,0 +1,2 @@
+IMAGE_RESIZE_DOMAIN=https://your-cloudfront-id.cloudfront.net/
+IMAGE_RESIZE_SIGNATURE=your-signature-key
