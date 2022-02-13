@@ -7,7 +7,7 @@
 
 * Docker
 * AWS CLI (`brew install awscli`)
-* SAM CLI (`pip3 install --user aws-sam-cli`)
+* SAM CLI (`brew tap aws/tap && brew install aws-sam-cli && sam --version`)
 * AWS credentials set in `~/.aws/credentials`
 * Understanding of SAM ([watch here](https://www.youtube.com/watch?v=bih5b3C1nqc))
 
