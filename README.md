@@ -26,7 +26,7 @@ sam local invoke Resin --no-event
 # {"statusCode": 500, "headers": {"Content-type": "application/json", "Cache-control": "max-age=0"}, "body": "{\"error\": \"Missing required configuration key\"}"}
 ```
 
-If you get errors, it may be to do with the Python version used by SAM
+If you get errors, it may be to do with the Python version used by SAM. Furthermore, you might need to upgrade packages, documented below.
 
 
 ##### To run locally:
