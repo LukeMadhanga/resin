@@ -2,8 +2,6 @@
 
 namespace App\Utilities;
 
-use Illuminate\Support\Str;
-
 class ImageResize
 {
 
@@ -115,13 +113,13 @@ class ImageResize
             's',
             "{$this->width}x{$this->height}",
             $this->getEncodedImageOptions(),
-            basename($this->imageUrl)
+            urlencode(basename($this->imageUrl))
         ];
 
         $url = implode('/', $parts);
 
         if ($this->sign) {
-            $url .= (Str::contains($url, '?') ? '&' : '?') . "sgn=" . md5($this->imageUrl . $this->signature);
+            $url .= "?sgn=" . md5($this->imageUrl . $this->signature);
         }
 
         return $url;
